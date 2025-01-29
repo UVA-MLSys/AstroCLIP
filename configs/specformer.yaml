@@ -19,25 +19,25 @@ trainer:
     class_path: CustomWandbLogger
     init_args:
       project: "astroclip-spectrum"
-      entity: "{WANDB_ENTITY_NAME}"
-      save_dir: ${trainer.default_root_dir}
+      # entity: "{WANDB_ENTITY_NAME}"
+      save_dir: "{ASTROCLIP_ROOT}/outputs"
 model:
-  class_path: SpecFormer
+  class_path: astroclip.models.specformer.SpecFormer
   init_args:
     input_dim: 22
     embed_dim: 768
     num_layers: 6
     num_heads: 6
     max_len: 800
-    dropout: 0.
+    dropout: 0
 data:
-  class_path: AstroClipDataloader
+  class_path: astroclip.data.datamodule.AstroClipDataloader
   init_args:
-    path: "{ASTROCLIP_ROOT}/datasets/astroclip_file/"
+    path: "mhsotoudeh/astroclip-mini" # "{ASTROCLIP_ROOT}/datasets/astroclip_file/"
     columns:
       - spectrum
     batch_size: 64
-    num_workers: 0
+    num_workers: 3
 optimizer:
   class_path: torch.optim.adamw.AdamW
   init_args:
@@ -47,8 +47,8 @@ optimizer:
       - 0.9
       - 0.95
 lr_scheduler:
-  class_path: CosineAnnealingWithWarmupLR
+  class_path: astroclip.scheduler.CosineAnnealingWithWarmupLR
   init_args:
-    T_max: ${trainer.max_steps}
+    T_max: 500_000 # ${trainer.max_steps}
     T_warmup: 2000
-    eta_min: ${eval:'${optimizer.init_args.lr}//100'}
+    eta_min: 1e-6

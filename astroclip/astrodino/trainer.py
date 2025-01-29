@@ -176,12 +176,15 @@ def do_train(cfg, model, run_name, group_name, resume=False):
         save_to_disk=True,
     )
 
-    start_iter = (
-        checkpointer.resume_or_load(cfg.MODEL.WEIGHTS, resume=resume).get(
-            "iteration", -1
+    if resume:
+        start_iter = (
+            checkpointer.resume_or_load(cfg.MODEL.WEIGHTS, resume=resume).get(
+                "iteration", -1
+            )
+            + 1
         )
-        + 1
-    )
+    else:
+        start_iter = 0
 
     OFFICIAL_EPOCH_LENGTH = cfg.train.OFFICIAL_EPOCH_LENGTH
     max_iter = cfg.optim.epochs * OFFICIAL_EPOCH_LENGTH
@@ -245,7 +248,7 @@ def do_train(cfg, model, run_name, group_name, resume=False):
     if global_rank == 0:
         wandb.init(
             project="astrodino",
-            entity=format_with_env("{WANDB_ENTITY_NAME}"),
+            # entity=format_with_env("{WANDB_ENTITY_NAME}"), # causes connection timeout error
             name=run_name,
             group=group_name,
             resume="allow",
@@ -352,9 +355,12 @@ def main_cli(cli_args=None):
     cfg = setup(args)
 
     model = SSLMetaArch(cfg).to(torch.device("cuda"))
-    model.prepare_for_distributed_training()
+    
+    if cfg.train.is_distributed:
+        model.prepare_for_distributed_training()
 
     logger.info("Model:\n{}".format(model))
+    print('Args ', args, '\n\n')
     if args.eval_only:
         iteration = (
             FSDPCheckpointer(model, save_dir=cfg.train.output_dir)

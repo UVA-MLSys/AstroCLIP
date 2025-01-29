@@ -60,7 +60,7 @@ ibot:
   head_hidden_dim: 2048
 train:
   batch_size_per_gpu: 72
-  dataset_path: LegacySurvey:split=train:root={ASTROCLIP_ROOT}/datasets/decals:extra=""
+  dataset_path: LegacySurvey;split=train;root={ASTROCLIP_ROOT}/datasets/decals;extra=""
   output_dir: .
   saveckp_freq: 20
   seed: 0
@@ -68,6 +68,7 @@ train:
   OFFICIAL_EPOCH_LENGTH: 1250
   cache_dataset: true
   centering: "centering" # or "sinkhorn_knopp"
+  is_distributed: false
 student:
   arch: vit_large
   patch_size: 12

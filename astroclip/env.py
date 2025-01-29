@@ -10,8 +10,8 @@ WARN_ONCE = True
 
 
 # TODO: change here the defaults
-ASTROCLIP_ROOT = "/mnt/ceph/users/polymathic/astroclip"
-WANDB_ENTITY_NAME = "flatiron-scipt"
+ASTROCLIP_ROOT = "C:/OSS/AstroCLIP" # "/mnt/ceph/users/polymathic/astroclip"
+WANDB_ENTITY_NAME = "khairulislamtanim"
 
 
 def default_dotenv_values():

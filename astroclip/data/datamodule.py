@@ -17,13 +17,19 @@ class AstroClipDataloader(L.LightningDataModule):
         columns: List[str] = ["image", "spectrum"],
         batch_size: int = 512,
         num_workers: int = 10,
+        # persistent_workers: bool = False,
         collate_fn: Callable[[Dict[str, Tensor]], Dict[str, Tensor]] = None,
     ) -> None:
         super().__init__()
         self.save_hyperparameters()
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     def setup(self, stage: str) -> None:
-        self.dataset = datasets.load_from_disk(self.hparams.path)
+        # self.dataset = datasets.load_from_disk(self.hparams.path)
+        self.dataset = datasets.load_dataset(
+            self.hparams.path, cache_dir='datasets/', 
+            trust_remote_code=True, keep_in_memory=True
+        )
         self.dataset.set_format(type="torch", columns=self.hparams.columns)
 
     def train_dataloader(self):
@@ -34,6 +40,8 @@ class AstroClipDataloader(L.LightningDataModule):
             num_workers=self.hparams.num_workers,  # NOTE: disable for debugging
             drop_last=True,
             collate_fn=self.hparams.collate_fn,
+            pin_memory=True,
+            persistent_workers=True,
         )
 
     def val_dataloader(self):
@@ -43,6 +51,8 @@ class AstroClipDataloader(L.LightningDataModule):
             num_workers=self.hparams.num_workers,  # NOTE: disable for debugging
             drop_last=True,
             collate_fn=self.hparams.collate_fn,
+            pin_memory=True,
+            persistent_workers=True,
         )
 
 

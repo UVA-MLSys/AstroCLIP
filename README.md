@@ -216,7 +216,7 @@ We train the model using 20 A100 GPUs (on 5 nodes) for 250k steps which takes ro
 #### Spectrum Pretraining - Masked Modelling Transformer:
 AstroCLIP uses a 1D Transformer to encode galaxy spectra. Pretraining is performed using a masked-modeling objective, whereby the 1D spectrum is split into contiguous, overlapping patches. Model training can be launched with the following command:
 ```
-spectrum_trainer fit -c config/specformer.yaml
+spectrum_trainer fit -c configs/specformer.yaml
 ```
 We train the model using 4 A100 GPUs (on 1 node) for 30k steps which takes roughly 12 hours.
 
@@ -224,7 +224,7 @@ We train the model using 4 A100 GPUs (on 1 node) for 30k steps which takes rough
 
 Once pretrained, we align the image and spectrum encoder using cross-attention projection heads to maximize the similarity between cross-modal embeddings that correspond to the same galaxy while simultaneously minimizing the similarity between cross-modal embeddings that correspond to different galaxies. Model training can be launched with the following command:
 ```
-spectrum_trainer fit -c config/astroclip.yaml
+spectrum_trainer fit -c configs/astroclip.yaml
 ```
 We train the model using 4 A100 GPUs (on 1 node) for 25k steps or until the validation loss does not increase for a fixed number of steps. This takes roughly 12 hours.
 

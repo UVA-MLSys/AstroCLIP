@@ -19,6 +19,7 @@ from tqdm import tqdm
 from astroclip.astrodino.data.augmentations import ToRGB
 from astroclip.env import format_with_env
 
+# Galaxy Zoo DECaLS: Detailed Visual Morphology Measurements from Volunteers and Deep Learning for 314,000 Galaxies
 gz_5_link = (
     "https://zenodo.org/records/4573248/files/gz_decals_volunteers_5.csv?download=1"
 )

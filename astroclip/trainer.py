@@ -2,7 +2,7 @@
 from typing import Any, Optional
 
 import matplotlib.pyplot as plt
-import wandb
+import wandb, torch
 from lightning import Callback, LightningModule, Trainer
 from lightning.pytorch.cli import (
     ArgsType,
@@ -42,10 +42,13 @@ class WrappedLightningCLI(LightningCLI):
 
 
 def main_cli(args: ArgsType = None, run: bool = True):
+    # trade-off precision for performance with the help of tensor cores
+    # torch.set_float32_matmul_precision('medium')
+    
     cli = WrappedLightningCLI(
         save_config_kwargs={"overwrite": True},
         save_config_callback=CustomSaveConfigCallback,
-        parser_kwargs={"parser_mode": "omegaconf"},
+        # parser_kwargs={"parser_mode": "omegaconf"},
         args=args,
         run=run,
     )

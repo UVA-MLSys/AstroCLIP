@@ -22,7 +22,7 @@ class SamplerType(Enum):
 
 
 def _parse_dataset_str(dataset_str: str):
-    tokens = dataset_str.split(":")
+    tokens = dataset_str.split(";")
 
     name = tokens[0]
     kwargs = {}
