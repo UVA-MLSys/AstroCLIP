@@ -16,12 +16,11 @@ trainer:
         every_n_epochs: 1
         monitor: "val_loss_nologit"
   logger:
-    class_path: CustomWandbLogger
+    class_path: astroclip.callbacks.CustomWandbLogger
     init_args:
       project: "astroclip-alignment"
-      entity: "{WANDB_ENTITY_NAME}"
-      save_dir: ${trainer.default_root_dir}
-  detect_anomaly: True
+      # entity: "{WANDB_ENTITY_NAME}" # results into connection timeout
+      save_dir: "{ASTROCLIP_ROOT}/outputs" # ${trainer.default_root_dir}
 model:
   class_path: AstroClipModel
   init_args:
@@ -36,16 +35,16 @@ model:
       init_args:
         model_path: "{ASTROCLIP_ROOT}/pretrained/specformer.ckpt"
 data:
-  class_path: AstroClipDataloader
+  class_path: astroclip.data.datamodule.AstroClipDataloader
   init_args:
-    path: "{ASTROCLIP_ROOT}/datasets/astroclip_file/"
+    path: "mhsotoudeh/astroclip-mini" # "{ASTROCLIP_ROOT}/datasets/astroclip_file/"
     columns:
       - image
       - spectrum
-    batch_size: 256
-    num_workers: 8
+    batch_size: 64 # increase for HPC
+    num_workers: 0 # keey at 0 for windows, increase for linux
     collate_fn:
-      class_path: astroclip.data.AstroClipCollator
+      class_path: astroclip.data.datamodule.AstroClipCollator
       init_args:
         center_crop: 144
 optimizer:
@@ -54,8 +53,8 @@ optimizer:
     lr: 1e-4
     weight_decay: 0.05
 lr_scheduler:
-  class_path: astroclip.CosineAnnealingWithWarmupLR
+  class_path: astroclip.scheduler.CosineAnnealingWithWarmupLR
   init_args:
     T_max: 10_000
     T_warmup: 1_000
-    eta_min: ${eval:'${optimizer.init_args.lr}//500'}
+    eta_min: 1e-7 # ${eval:'${optimizer.init_args.lr}//500'}

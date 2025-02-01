@@ -11,7 +11,7 @@ from dinov2.eval.setup import setup_and_build_model
 
 from ..modules import MLP, CrossAttentionHead
 from .specformer import SpecFormer
-
+from astroclip.scheduler import CosineAnnealingWithWarmupLR
 
 class AstroClipModel(L.LightningModule):
     def __init__(
@@ -87,8 +87,8 @@ class AstroClipModel(L.LightningModule):
         )
 
         # Log the losses
-        self.log("train_loss_withlogit", loss_withlogit)
-        self.log("train_loss_nologit", loss_nologit)
+        self.log("train_loss_withlogit", loss_withlogit, on_step=False, on_epoch=True, prog_bar=True)
+        self.log("train_loss_nologit", loss_nologit, on_step=False, on_epoch=True, prog_bar=True)
         self.log("scale", self.logit_scale)
 
         # Return the loss
@@ -110,8 +110,19 @@ class AstroClipModel(L.LightningModule):
         )
 
         # Log the losses
-        self.log("val_loss_nologit", val_loss_nologit)
-        self.log("val_loss_withlogit", val_loss_withlogit)
+        self.log("val_loss_nologit", val_loss_nologit, on_step=False, on_epoch=True, prog_bar=True)
+        self.log("val_loss_withlogit", val_loss_withlogit, on_step=False, on_epoch=True, prog_bar=True)
+        
+     
+    def configure_optimizers(self):
+        optimizer = torch.optim.Adam(self.parameters(), lr=1e-4, weight_decay=.05)
+        scheduler = CosineAnnealingWithWarmupLR(
+            optimizer, T_max=10_000, T_warmup=1_000, eta_min=1e-7
+        )
+        return [optimizer], [{"scheduler": scheduler, "interval": "epoch"}]
+
+    def lr_scheduler_step(self, scheduler, metric):
+        scheduler.step(epoch=self.current_epoch)  # timm's scheduler need the epoch value
 
 
 class CLIPLoss(nn.Module):

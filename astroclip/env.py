@@ -10,7 +10,7 @@ WARN_ONCE = True
 
 
 # TODO: change here the defaults
-ASTROCLIP_ROOT = "C:/OSS/AstroCLIP" # "/mnt/ceph/users/polymathic/astroclip"
+ASTROCLIP_ROOT = "." # "/mnt/ceph/users/polymathic/astroclip"
 WANDB_ENTITY_NAME = "khairulislamtanim"
 
 

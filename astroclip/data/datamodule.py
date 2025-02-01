@@ -4,7 +4,7 @@ import datasets
 import lightning as L
 import torch
 from torch import Tensor
-from torch.utils.data.dataloader import default_collate
+from torch.utils.data import default_collate
 from torchvision.transforms import CenterCrop
 
 from ..astrodino.data.augmentations import ToRGB
@@ -22,7 +22,8 @@ class AstroClipDataloader(L.LightningDataModule):
     ) -> None:
         super().__init__()
         self.save_hyperparameters()
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        # save_hyperparameters converts collate_fn to a dict, which is not callable
+        self.collate_fn = collate_fn
 
     def setup(self, stage: str) -> None:
         # self.dataset = datasets.load_from_disk(self.hparams.path)
@@ -39,9 +40,9 @@ class AstroClipDataloader(L.LightningDataModule):
             shuffle=True,
             num_workers=self.hparams.num_workers,  # NOTE: disable for debugging
             drop_last=True,
-            collate_fn=self.hparams.collate_fn,
+            collate_fn=self.collate_fn,
             pin_memory=True,
-            persistent_workers=True,
+            # persistent_workers=self.persistent_workers
         )
 
     def val_dataloader(self):
@@ -50,9 +51,9 @@ class AstroClipDataloader(L.LightningDataModule):
             batch_size=self.hparams.batch_size,
             num_workers=self.hparams.num_workers,  # NOTE: disable for debugging
             drop_last=True,
-            collate_fn=self.hparams.collate_fn,
+            collate_fn=self.collate_fn,
             pin_memory=True,
-            persistent_workers=True,
+            # persistent_workers=self.persistent_workers
         )
 
 
