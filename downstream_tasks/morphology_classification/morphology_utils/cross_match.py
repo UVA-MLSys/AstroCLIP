@@ -18,6 +18,7 @@ from tqdm import tqdm
 
 from astroclip.astrodino.data.augmentations import ToRGB
 from astroclip.env import format_with_env
+import glob
 
 # Galaxy Zoo DECaLS: Detailed Visual Morphology Measurements from Volunteers and Deep Learning for 314,000 Galaxies
 gz_5_link = (
@@ -99,6 +100,10 @@ def _download_gz5_decals(survey_path: str) -> None:
 
 
 def _get_file_location(root_dir: List[str]) -> List[str]:
+    # read all glob files in the root directory
+    # this decals data comes from https://github.com/georgestein/ssl-legacysurvey
+    return glob.glob(root_dir + "/*.h5")
+
     """Get the locations of the Legacy Survey image files."""
     north_path = os.path.join(root_dir, "north")
     south_path = os.path.join(root_dir, "south")
@@ -159,7 +164,7 @@ def cross_match_galaxy_zoo(
 
     # Save classifications
     print(f"Saving paired classifications to {save_path}", flush=True)
-    classifications.write(save_path, overwrite=True, format="hdf5")
+    classifications.write(save_path, overwrite=True, format="hdf5", serialize_meta=True)
 
 
 if __name__ == "__main__":
