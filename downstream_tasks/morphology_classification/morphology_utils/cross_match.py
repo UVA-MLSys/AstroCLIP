@@ -103,7 +103,8 @@ def _download_gz5_decals(survey_path: str) -> None:
 def _get_file_location(root_dir: List[str]) -> List[str]:
     # read all glob files in the root directory
     # this decals data comes from https://github.com/georgestein/ssl-legacysurvey
-    return glob.glob(root_dir + "/*.h5")
+    pattern = os.path.join(root_dir, "**", "*.h5")
+    return glob.glob(pattern, recursive=True)
 
     """Get the locations of the Legacy Survey image files."""
     north_path = os.path.join(root_dir, "north")
