@@ -28,7 +28,7 @@ Download the pretrained models listed in the readme. Save them in `pretrained` f
 ### Classification
 
 * `python \downstream_tasks\morphology_classification\morphology_utils\cross_match.py`: This uses the `h5` files in the `datasets/decals` folder and the `galaxy_zoo/gz_decals_volunteers_5.csv` to create a crossmatched `hdf5` file.
-* 
+* `python .\downstream_tasks\morphology_classification\embed_galaxy_zoo.py`: This will use the previous crossmatched `hdf5` file and models from pretrained folder to save the embeddings.
 
 ## References
 

@@ -49,6 +49,10 @@ def get_embeddings(
     model_embeddings = {
         key: np.concatenate(model_embeddings[key]) for key in model_embeddings.keys()
     }
+    for key in model_embeddings.keys():
+        assert len(model_embeddings[key]) == len(images), "Embeddings incorrect length"
+        print(f"Embeddings for {key} are of shape {model_embeddings[key].shape}")
+        
     return model_embeddings
 
 
@@ -60,6 +64,7 @@ def embed_galaxy_zoo(
     # Get directories
     astrodino_output_dir = os.path.join(pretrained_dir, "astrodino_output_dir")
 
+    print("Setting up models")
     pretrained_weights = {}
     for model in ["astroclip", "stein", "astrodino", "specformer"]:
         pretrained_weights[model] = os.path.join(pretrained_dir, f"{model}.ckpt")
@@ -83,7 +88,7 @@ def embed_galaxy_zoo(
         "stein": lambda x: stein(x).cpu().numpy(),
         "astroclip": lambda x: astroclip(x, input_type="image").cpu().numpy(),
     }
-    print("Models are correctly set up!")
+    print("Models are correctly set up!\n")
 
     # Get embeddings
     galaxy_zoo = Table.read(galaxy_zoo_file)
@@ -96,6 +101,7 @@ def embed_galaxy_zoo(
         assert len(embeddings[key]) == len(galaxy_zoo), "Embeddings incorrect length"
         galaxy_zoo[f"{key}_embeddings"] = embeddings[key]
 
+    print('Saving embeddings...\n')
     # Save embeddings
     galaxy_zoo.write(galaxy_zoo_file.replace(".h5", "_embeddings.h5"), overwrite=True)
 

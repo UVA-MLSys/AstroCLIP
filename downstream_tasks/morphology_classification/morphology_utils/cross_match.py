@@ -42,6 +42,7 @@ def _generate_catalog(files: List[str]) -> Table:
             file_list.extend([file] * len(ra))
             index_list.extend(range(0, len(ra)))
 
+    print(f'Total number of galaxies: {len(ra_list)} \n')
     # Create astropy table
     return Table(
         [ra_list, dec_list, index_list, file_list], names=("ra", "dec", "index", "file")
@@ -57,7 +58,7 @@ def _cross_match_tables(
     coords1 = SkyCoord(ra=table1["ra"] * u.degree, dec=table1["dec"] * u.degree)
     coords2 = SkyCoord(ra=table2["ra"] * u.degree, dec=table2["dec"] * u.degree)
 
-    print("Matching coordinates", flush=True)
+    print("Matching coordinates")
 
     # Match coordinates
     idx, d2d, _ = coords1.match_to_catalog_sky(coords2)
@@ -66,7 +67,7 @@ def _cross_match_tables(
     max_sep = max_sep * u.arcsec
     sep_constraint = d2d < max_sep
 
-    print(f"Total number of matches: {np.sum(sep_constraint)} \n", flush=True)
+    print(f"Total number of matches: {np.sum(sep_constraint)} \n")
     return table1[sep_constraint], table2[idx[sep_constraint]]
 
 
@@ -164,7 +165,7 @@ def cross_match_galaxy_zoo(
 
     # Save classifications
     print(f"Saving paired classifications to {save_path}", flush=True)
-    classifications.write(save_path, overwrite=True, format="hdf5", serialize_meta=True)
+    classifications.write(save_path, overwrite=True, format="hdf5")
 
 
 if __name__ == "__main__":
@@ -179,7 +180,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--save_path",
         type=str,
-        default=f"{ASTROCLIP_ROOT}/datasets/galaxy_zoo/gz5_decals_crossmatched.hdf5",
+        default=f"{ASTROCLIP_ROOT}/datasets/galaxy_zoo/gz5_decals_crossmatched.h5",
         help="Path to Galaxy Zoo survey.",
     )
     parser.add_argument(

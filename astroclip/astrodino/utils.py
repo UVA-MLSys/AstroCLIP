@@ -233,4 +233,5 @@ def setup_astrodino(
     sys.stdout = open(os.devnull, "w")  # Redirect stdout to null
     astrodino, _ = setup_and_build_model(config())
     sys.stderr = sys.__stderr__  # Reset stderr
+    sys.stdout = sys.__stdout__  # Reset stdout
     return astrodino
