@@ -1,4 +1,4 @@
-from argparse import ArgumentParser
+from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 
 import h5py
 import numpy as np
@@ -42,8 +42,12 @@ def embed_astroclip(
 
     # Get the embeddings over the dataset
     im_embeddings, sp_embeddings, images, spectra, obj_ids = [], [], [], [], []
+    total = len(loader.dataset)
+    if max_size is not None:
+        total = min(total, max_size)
+    
     with torch.no_grad():
-        for idx, batch_test in tqdm(enumerate(loader), desc="Extracting embeddings"):
+        for idx, batch_test in tqdm(enumerate(loader), desc="Extracting embeddings", total=total):
             # Break if max_size is reached
             if max_size is not None and idx * batch_size >= max_size:
                 break
@@ -79,11 +83,12 @@ def embed_astroclip(
 
 if __name__ == "__main__":
     ASTROCLIP_ROOT = format_with_env("{ASTROCLIP_ROOT}")
-    parser = ArgumentParser()
+    parser = ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter)
     parser.add_argument(
-        "save_path",
+        "--save_path",
         type=str,
         help="Path to save the embeddings",
+        default=f"{ASTROCLIP_ROOT}/datasets/embeded_astroclip.hdf5",
     )
     parser.add_argument(
         "--model_path",

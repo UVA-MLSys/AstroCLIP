@@ -26,11 +26,13 @@ class AstroClipDataloader(L.LightningDataModule):
         self.collate_fn = collate_fn
 
     def setup(self, stage: str) -> None:
-        # self.dataset = datasets.load_from_disk(self.hparams.path)
-        self.dataset = datasets.load_dataset(
-            self.hparams.path, cache_dir='datasets/', 
-            trust_remote_code=True, keep_in_memory=True
-        )
+        # this assumes the dataset is already downloaded
+        # run the scripts/download_matched_data.py file if not downloaded yet
+        self.dataset = datasets.load_from_disk(self.hparams.path)
+        # self.dataset = datasets.load_dataset(
+        #     self.hparams.path, cache_dir='datasets/', 
+        #     trust_remote_code=True, keep_in_memory=True
+        # )
         self.dataset.set_format(type="torch", columns=self.hparams.columns)
 
     def train_dataloader(self):
