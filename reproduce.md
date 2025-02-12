@@ -48,6 +48,7 @@ Download the pretrained models listed in the readme. Save them in `pretrained` f
 ### Similarity Search
 
 * Run `python .\downstream_tasks\similarity_search\embed_astroclip.py --batch_size 64 --max_size 1024` if you want to reproduce a small subset of the validation data. The smaller batch size helps is run locally. Run `python .\downstream_tasks\similarity_search\embed_astroclip.py` for the originial results.
+* Run the `similarity_search.ipynb` notebook.
 
 ## References
 
