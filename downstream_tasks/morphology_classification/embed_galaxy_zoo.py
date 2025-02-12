@@ -49,9 +49,6 @@ def get_embeddings(
     model_embeddings = {
         key: np.concatenate(model_embeddings[key]) for key in model_embeddings.keys()
     }
-    for key in model_embeddings.keys():
-        assert len(model_embeddings[key]) == len(images), "Embeddings incorrect length"
-        print(f"Embeddings for {key} are of shape {model_embeddings[key].shape}")
         
     return model_embeddings
 
@@ -119,6 +116,8 @@ if __name__ == "__main__":
         type=str,
         default=f"{ASTROCLIP_ROOT}/pretrained",
     )
+    
+    # choose a smaller batch size if running locally, e.g. 64
     parser.add_argument("--batch_size", type=int, default=1024)
     args = parser.parse_args()
 

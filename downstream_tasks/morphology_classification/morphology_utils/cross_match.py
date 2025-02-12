@@ -80,6 +80,8 @@ def _get_images(files: list[str], classifications: Table) -> Table:
     # Add images to catalog
     print("Adding images to catalog", flush=True)
     images = np.zeros((len(classifications), 3, 144, 144))
+    
+    #TODO: make the following faster and batchwise
     for idx, file in enumerate(files):
         print(f"Processing file: {idx}", flush=True)
         with h5py.File(file, "r") as f:
