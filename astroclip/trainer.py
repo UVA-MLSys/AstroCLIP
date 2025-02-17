@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 from typing import Any, Optional
 
 import matplotlib.pyplot as plt
@@ -13,8 +12,9 @@ from lightning.pytorch.cli import (
 from lightning.pytorch.loggers import WandbLogger
 from torch.optim import Optimizer
 
-from astroclip import format_with_env
+from astroclip.env import format_with_env
 from astroclip.callbacks import CustomSaveConfigCallback
+import os
 
 
 class WrappedLightningCLI(LightningCLI):
@@ -45,12 +45,15 @@ def main_cli(args: ArgsType = None, run: bool = True):
     # trade-off precision for performance with the help of tensor cores
     # torch.set_float32_matmul_precision('medium')
     
+    # returns SLURM_NTASKS not found error for the multimodal training
+    os.environ["SLURM_NTASKS"] = "1"
+    
     cli = WrappedLightningCLI(
         save_config_kwargs={"overwrite": True},
         save_config_callback=CustomSaveConfigCallback,
         # parser_kwargs={"parser_mode": "omegaconf"},
         args=args,
-        run=run,
+        run=run
     )
     return cli
 

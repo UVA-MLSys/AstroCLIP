@@ -1,6 +1,7 @@
 astropy
 datasets
-dinov2 @ git+https://github.com/facebookresearch/dinov2.git@2302b6bf46953431b969155307b9bed152754069
+# I installed separately after cloning with `pip install -e .` in the dinov2 project dir
+# dinov2 @ git+https://github.com/facebookresearch/dinov2.git@2302b6bf46953431b969155307b9bed152754069
 huggingface_hub
 jaxtyping
 lightning[extra]
@@ -11,5 +12,5 @@ pyro-ppl
 python-dotenv
 scikit-image
 scikit-learn
-torchvision==0.15.0
+torchvision # ==0.15.0
 wandb

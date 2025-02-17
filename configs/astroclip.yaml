@@ -22,12 +22,12 @@ trainer:
       # entity: "{WANDB_ENTITY_NAME}" # results into connection timeout
       save_dir: "{ASTROCLIP_ROOT}/outputs" # ${trainer.default_root_dir}
 model:
-  class_path: AstroClipModel
+  class_path: astroclip.models.astroclip.AstroClipModel
   init_args:
     image_encoder:
       class_path: astroclip.models.astroclip.ImageHead
       init_args:
-        config: "astroclip/astrodino/config.yaml"
+        config: "{ASTROCLIP_ROOT}/astroclip/astrodino/config.yaml"
         model_weights: "{ASTROCLIP_ROOT}/pretrained/astrodino.ckpt"
         save_directory: "{ASTROCLIP_ROOT}/outputs/astrodino"
     spectrum_encoder:
@@ -37,7 +37,7 @@ model:
 data:
   class_path: astroclip.data.datamodule.AstroClipDataloader
   init_args:
-    path: "mhsotoudeh/astroclip-mini" # "{ASTROCLIP_ROOT}/datasets/astroclip_file/"
+    path: "./datasets/astroclip_file/" # {ASTROCLIP_ROOT} here isn't replaced before fed to data for some reason, so results in error
     columns:
       - image
       - spectrum

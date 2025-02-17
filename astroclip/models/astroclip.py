@@ -194,7 +194,7 @@ class ImageHead(nn.Module):
         super().__init__()
 
         # Define DINO config
-        class config:
+        class Config:
             output_dir = save_directory
             config_file = config
             pretrained_weights = model_weights
@@ -202,7 +202,7 @@ class ImageHead(nn.Module):
 
         # Define DINO model
         sys.stdout = open(os.devnull, "w")  # Redirect stdout to null
-        self.backbone, _ = setup_and_build_model(config())
+        self.backbone, _ = setup_and_build_model(Config())
         sys.stdout = sys.__stdout__  # Reset stdout
 
         # Freeze backbone if necessary
