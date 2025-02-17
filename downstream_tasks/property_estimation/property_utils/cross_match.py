@@ -14,6 +14,8 @@ from tqdm import tqdm
 
 from astroclip.data.datamodule import AstroClipCollator, AstroClipDataloader
 from astroclip.env import format_with_env
+import warnings
+warnings.filterwarnings("ignore")
 
 provabgs_file = "https://data.desi.lbl.gov/public/edr/vac/edr/provabgs/v1.0/BGS_ANY_full.provabgs.sv3.v0.hdf5"
 
@@ -77,6 +79,7 @@ def cross_match_provabgs(
     save_path: str = None,
     batch_size: int = 128,
     num_workers: int = 20,
+    max_size: int = None,
 ):
     """Cross-match the AstroCLIP and PROVABGS datasets."""
 
@@ -96,13 +99,20 @@ def cross_match_provabgs(
 
     # Process the images
     train_images, train_spectra, train_targetids = [], [], []
-    for batch in tqdm(dataloader.train_dataloader(), desc="Processing train images"):
+    loader = dataloader.train_dataloader()
+    
+    for idx, batch in tqdm(enumerate(loader), desc="Processing train images", total=len(loader)):
+        if max_size is not None and idx * batch_size >= max_size: break
+        
         train_images.append(batch["image"])
         train_spectra.append(batch["spectrum"])
         train_targetids.append(batch["targetid"])
 
     test_images, test_spectra, test_targetids = [], [], []
-    for batch in tqdm(dataloader.val_dataloader(), desc="Processing test images"):
+    loader = dataloader.val_dataloader()
+    for idx, batch in tqdm(enumerate(loader), desc="Processing test images", total=len(loader)):
+        if max_size is not None and idx * batch_size >= max_size: break
+        
         test_images.append(batch["image"])
         test_spectra.append(batch["spectrum"])
         test_targetids.append(batch["targetid"])
@@ -188,10 +198,34 @@ if __name__ == "__main__":
         default=None,
         help="Path to save the paired datasets.",
     )
+    
+    parser.add_argument(
+        "--num_workers",
+        type=int,
+        default=20,
+        help="Number of workers to use.",
+    )
+    
+    parser.add_argument(
+        "--max_size",
+        type=int,
+        default=None,
+        help="Maximum number of samples to use.",
+    )
+
+    parser.add_argument(
+        "--batch_size",
+        type=int,
+        default=128,
+        help="Batch size",
+    )
 
     args = parser.parse_args()
     cross_match_provabgs(
         astroclip_path=args.astroclip_path,
         provabgs_path=args.provabgs_path,
         save_path=args.save_path,
+        batch_size=args.batch_size,
+        num_workers=args.num_workers,
+        max_size=args.max_size
     )

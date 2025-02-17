@@ -24,9 +24,11 @@ This dataset is used for the multimodal training and all later downstream tasks.
 
 ### DESI PROVABGS
 
-They use a sample corresponding to roughly 1 per cent of the DESI Bright Galaxy Survey [5]. From public [DESI homepage](https://data.desi.lbl.gov/doc/access/#globus), we get the [Globus link](https://app.globus.org/file-manager?origin_id=6b4e1f6a-e600-11ed-9b9b-c9bb788c490e) and [direct download link](https://data.desi.lbl.gov/public/edr/vac/edr/provabgs/v1.0/). The target file (~3GB) is at location `/edr/vac/edr/provabgs/v1.0/BGS_ANY_full.provabgs.sv3.v0.hdf5`. The POVABGS homepage is [here](https://data.desi.lbl.gov/doc/releases/edr/vac/provabgs/). 
+They use a sample corresponding to roughly 1 per cent of the DESI Bright Galaxy Survey [5]. From public [DESI homepage](https://data.desi.lbl.gov/doc/access/#globus), we get the [Globus link](https://app.globus.org/file-manager?origin_id=6b4e1f6a-e600-11ed-9b9b-c9bb788c490e) and [direct download link](https://data.desi.lbl.gov/public/edr/vac/edr/provabgs/v1.0/BGS_ANY_full.provabgs.sv3.v0.hdf5). The target file (~3GB) is at location `/edr/vac/edr/provabgs/v1.0/BGS_ANY_full.provabgs.sv3.v0.hdf5`. The POVABGS homepage is [here](https://data.desi.lbl.gov/doc/releases/edr/vac/provabgs/). 
 
-Note, Multimodal Universe has a PROVABGS [dataset](https://huggingface.co/datasets/MultimodalUniverse/desi_provabgs) with 100k rows and 600MB size.
+* Download the dataset from [direct download link](https://data.desi.lbl.gov/public/edr/vac/edr/provabgs/v1.0/BGS_ANY_full.provabgs.sv3.v0.hdf5) and save at `/datasets/provabgs/provabgs.hdf5`.
+
+Note, Multimodal Universe has a PROVABGS [dataset](https://huggingface.co/datasets/MultimodalUniverse/desi_provabgs) with 100k rows and 600MB size. Which is smaller, so we are not using.
 
 ### Galaxy Zoo DECaLS: Morphology classification
 
@@ -40,10 +42,28 @@ Download the pretrained models listed in the readme. Save them in `pretrained` f
 
 ## Benchmark
 
+### CLIP Alignment:
+
+Once pretrained, we align the image and spectrum encoder using cross-attention projection heads to maximize the similarity between cross-modal embeddings that correspond to the same galaxy while simultaneously minimizing the similarity between cross-modal embeddings that correspond to different galaxies. Model training can be launched with the following command:
+```
+spectrum_trainer fit -c configs/astroclip.yaml
+```
+We train the model using 4 A100 GPUs (on 1 node) for 25k steps or until the validation loss does not increase for a fixed number of steps. This takes roughly 12 hours.
+
+* If `SLURM_NTASKS` not found error, then if running from termila, run `export SLURM_NTASKS=1` or if using slurm set `#SBATCH --ntasks=1` or higher values.
+
 ### Classification
 
-* `python \downstream_tasks\morphology_classification\morphology_utils\cross_match.py`: This uses the `h5` files in the `datasets/decals` folder and the `galaxy_zoo/gz_decals_volunteers_5.csv` to create a crossmatched `hdf5` file.
+* `python downstream_tasks\morphology_classification\morphology_utils\cross_match.py`: This uses the `h5` files in the `datasets/decals` folder and the `galaxy_zoo/gz_decals_volunteers_5.csv` to create a crossmatched `hdf5` file.
 * `python .\downstream_tasks\morphology_classification\embed_galaxy_zoo.py`: This will use the previous crossmatched `hdf5` file and models from pretrained folder to save the embeddings.
+
+### Property Estimation
+
+* `python .\downstream_tasks\property_estimation\property_utils\cross_match.py`. For a smaller subset use `python .\downstream_tasks\property_estimation\property_utils\cross_match.py --num_workers 0 --batch_size 64 --max_size 5000`. When on windows, keep the num_workers=0.
+* `python .\downstream_tasks\property_estimation\embed_provabgs.py`. Reduce the batch size if running locally. Batch 32 takes ~1h.
+
+For the next 
+
 
 ### Similarity Search
 

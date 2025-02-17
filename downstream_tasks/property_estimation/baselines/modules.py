@@ -80,7 +80,7 @@ class SupervisedModel(L.LightningModule):
     def configure_optimizers(self):
         optimizer = optim.Adam(self.parameters(), lr=self.lr)
         scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, self.num_epochs)
-        return {"optimizer": optimizer, "scheduler": scheduler}
+        return optimizer, scheduler # {"optimizer": optimizer, "scheduler": scheduler}
 
 
 class ResNet18(nn.Module):

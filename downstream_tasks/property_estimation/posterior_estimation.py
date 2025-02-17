@@ -48,7 +48,7 @@ def _get_properties(train_dataset, test_dataset, properties=PROPERTIES):
     return y_train, y_test, scale
 
 
-def _get_data(train_path, test_path, source):
+def _get_data(train_path, test_path, source, batch_size):
     # Load the data
     train_provabgs = Table.read(train_path)
     test_provabgs = Table.read(test_path)
@@ -243,7 +243,7 @@ def run_flow_for_model(
     n_samples: int = 100,
 ):
     # Get data
-    X_train, X_test, y_train, y_test, scale = _get_data(train_path, test_path, source)
+    X_train, X_test, y_train, y_test, scale = _get_data(train_path, test_path, source, batch_size)
 
     # Get validation dataset
     train_dataset = TensorDataset(X_train, y_train)

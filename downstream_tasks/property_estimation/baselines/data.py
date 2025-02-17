@@ -33,9 +33,9 @@ class SupervisedDataModule(L.LightningDataModule):
     def setup(self, stage=None):
         if self.modality == "image":
             # Load the data
-            X_train, X_test = torch.tensor(
-                self.train_data[self.modality], dtype=torch.float32
-            ), torch.tensor(self.test_data[self.modality], dtype=torch.float32)
+            X_train, X_test = torch.from_numpy(
+                self.train_data[self.modality].copy()
+            ).type(torch.float32), torch.from_numpy(self.test_data[self.modality].copy()).type(torch.float32)
         elif self.modality == "spectrum":
             X_train, X_test = torch.tensor(
                 self.train_data[self.modality], dtype=torch.float32
@@ -75,7 +75,7 @@ class SupervisedDataModule(L.LightningDataModule):
         # Set up the property data
         property_data, scale = {}, {}
         for p in self.properties:
-            data = torch.tensor(self.train_data[p].data, dtype=torch.float32)
+            data = torch.from_numpy(self.train_data[p].data.copy()).type(torch.float32) # torch.tensor(self.train_data[p].data, dtype=torch.float32)
             mean, std = data.mean(), data.std()
             property_data[p] = ((data - mean) / std).squeeze()
             scale[p] = {"mean": mean.numpy(), "std": std.numpy()}

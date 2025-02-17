@@ -27,7 +27,7 @@ def get_embeddings(
     im_batch, sp_batch = [], []
 
     assert len(images) == len(spectra)
-    for image, spectrum in tqdm(zip(images, spectra)):
+    for image, spectrum in tqdm(zip(images, spectra), total=len(images)):
         # Load images, already preprocessed
         im_batch.append(torch.tensor(image, dtype=torch.float32)[None, :, :, :])
         sp_batch.append(torch.tensor(spectrum, dtype=torch.float32)[None, :, :])
@@ -87,7 +87,7 @@ def embed_provabgs(
     ).encoder_q
 
     # Set up SpecFormer model
-    checkpoint = torch.load(pretrained_weights["specformer"])
+    checkpoint = torch.load(pretrained_weights["specformer"], weights_only=False)
     specformer = SpecFormer(**checkpoint["hyper_parameters"])
     specformer.load_state_dict(checkpoint["state_dict"])
     specformer.cuda()
