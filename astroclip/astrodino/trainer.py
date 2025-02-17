@@ -350,7 +350,8 @@ def main_cli(cli_args=None):
     args = get_args_parser(add_help=True).parse_args(cli_args)
     
     # returns SLURM_NTASKS not found error for the multimodal training
-    os.environ["SLURM_NTASKS"] = "1"
+    if os.environ.get("SLURM_NTASKS") is None:
+        os.environ["SLURM_NTASKS"] = "1"
 
     run_name = str(args.run_name)
     args.output_dir = f"{ASTROCLIP_ROOT}/outputs/astroclip_image/{run_name}"

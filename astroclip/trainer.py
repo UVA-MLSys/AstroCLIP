@@ -46,7 +46,8 @@ def main_cli(args: ArgsType = None, run: bool = True):
     # torch.set_float32_matmul_precision('medium')
     
     # returns SLURM_NTASKS not found error for the multimodal training
-    os.environ["SLURM_NTASKS"] = "1"
+    if os.environ.get("SLURM_NTASKS") is None:
+        os.environ["SLURM_NTASKS"] = "1"
     
     cli = WrappedLightningCLI(
         save_config_kwargs={"overwrite": True},

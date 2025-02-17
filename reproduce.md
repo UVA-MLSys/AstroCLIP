@@ -2,6 +2,45 @@
 
 ## Installation
 
+The training and evaluation code requires PyTorch 2.0. Additionally, an up-to-date eventlet is required for wandb. Note that the code has only been tested with the specified versions and also expects a Linux environment. 
+
+### Astrodino
+
+This library is used for image pretraining. It is better to install separately.
+
+* Clone from [here](https://github.com/facebookresearch/dinov2.git). Cd into the dinov2 folder.
+* If you already have torch, torchvision and torchmetrics libraries installed locally, I'll suggest commenting out those libraries in the requirements.txt file. xformers can be at the version specified by them.
+* Run the following from the dinov2 folder `pip install -e `.This installs the library into editable format and makes easier to fix errors.
+
+### Astroclip
+
+To install the AstroCLIP package and its dependencies locally clone this github repo. In the requirements.txt file comment out the dinov2, since we have already installed it. Remove the version constrain in torchvision, it is unnecessary and may fail the setup.  Then run the following from the Astroclip folder:
+
+```bash
+pip install --upgrade pip
+pip install --upgrade eventlet torch lightning[extra]
+pip install -e .
+```
+
+**NOTE** The package provides the three shortcuts: `astroclip_trainer` and `spectrum_trainer`, which link to `astroclip/trainer.py`, and `image_trainer`, which links to `astroclip/astrodino/trainer.py`, as long as it is installed. The shortcuts are defined in the `project.scripts` section of the `pyproject.toml` file.
+
+### Handling roots
+
+The package expects to load models and data by default from
+
+```bash
+{ASTROCLIP_ROOT}
+```
+
+You can configure `ASTROCLIP_ROOT` as well as the weights and biases group in which runs are saved by creating a `.env` file in the root of `ASTROCLIP/astroclip` folder with the following content:
+
+```bash
+ASTROCLIP_ROOT="."
+WANDB_ENTITY_NAME="personal"
+```
+
+If no environment is specified, the default path at Flatiron will be assumed.
+
 ## Data
 
 ### DESI-LS
