@@ -47,9 +47,8 @@ If no environment is specified, the default path at Flatiron will be assumed.
 
 DESI-LS Data Release 9 from 2021 January as prepared by Stein et al. (2021b) [1]. Contains 76 million galaxy images.
 
-* [Globus](https://app.globus.org/file-manager?origin_id=59c818dc-8542-46d8-80d9-ab144669c7b6&origin_path=%2Fssl-legacysurvey%2F): The data set is large (20 TB). Contains two subfolders `north` and `south` with 14 and 62 `h5` files respectively. Downloading at least 1 is fine for reproducing.
+* [Globus](https://app.globus.org/file-manager?origin_id=59c818dc-8542-46d8-80d9-ab144669c7b6&origin_path=%2Fssl-legacysurvey%2F): The data set is large (20 TB). Contains two subfolders `north` and `south` with 14 and 62 `h5` files respectively. **Downloading at least 1 file is fine for reproducing.** Download the data into `datasets/decals` folder.
 * There is also a small toy datasample in the [Github](https://github.com/georgestein/ssl-legacysurvey) at [data/tiny_dataset.h5](https://github.com/georgestein/ssl-legacysurvey/blob/main/data/tiny_dataset.h5). But this would require slightly modifying the dataloaders.
-* Download the data into `datasets/decals` folder.
 
 ### DESI Spectra
 
@@ -78,21 +77,45 @@ Contains detailed visual morphology measurements from volunteers and deep learni
 
 There is a more updated version of the Galaxy Zoo with different models, called [Galaxy10 DECaLS](https://astronn.readthedocs.io/en/latest/galaxy10.html) [3]. It was also used in the Multimodal Universe paper [4] with different vision models. It comes with 17,736 selected images in 10 broad classes (~2.54GB) with more rigorus filtering. Download the data from [Galaxy10_DECals.h5](https://zenodo.org/records/10845026/files/Galaxy10_DECals.h5).
 
-## Model
+## Pretrained Models
 
-Download the pretrained models listed in the readme. Save them in `pretrained` folder. Download the `trained_model/resnet50.ckpt` model from Stein et al. [Globus](https://app.globus.org/file-manager?origin_id=59c818dc-8542-46d8-80d9-ab144669c7b6&origin_path=%2Fssl-legacysurvey%2F) and save it as `stein.ckpt` in the pretrained folder.
+Download the pretrained models as listed in the readme: [astroclip](https://huggingface.co/polymathic-ai/astroclip), [astrodino](https://huggingface.co/polymathic-ai/astrodino), [specformer](https://huggingface.co/polymathic-ai/specformer). Save them in `pretrained` folder. Download the `trained_model/resnet50.ckpt` model from Stein et al. [Globus](https://app.globus.org/file-manager?origin_id=59c818dc-8542-46d8-80d9-ab144669c7b6&origin_path=%2Fssl-legacysurvey%2F) and save it as `stein.ckpt` in the pretrained folder.
 
 ## Benchmark
+
+Must run on GPU. If on windows, set `num_workers=0` in config files.
+
+### Image Pretraining - DINOv2 ViT [Skip for now]
+
+AstroCLIP uses a Vision Transformer (ViT) to encode galaxy images. Pretraining is performed using the DINOv2 package, which combines self-distillation, masked-modeling, and contrastive objectives. It must run on a distributed environment. Model training can be launched with the following command:
+
+```bash
+image_trainer -c astroclip/astrodino/config.yaml
+```
+
+We train the model using 20 A100 GPUs (on 5 nodes) for 250k steps which takes roughly 46 hours.
 
 ### CLIP Alignment
 
 Once pretrained, we align the image and spectrum encoder using cross-attention projection heads to maximize the similarity between cross-modal embeddings that correspond to the same galaxy while simultaneously minimizing the similarity between cross-modal embeddings that correspond to different galaxies. Model training can be launched with the following command:
+
 ```
 spectrum_trainer fit -c configs/astroclip.yaml
 ```
+
 We train the model using 4 A100 GPUs (on 1 node) for 25k steps or until the validation loss does not increase for a fixed number of steps. This takes roughly 12 hours.
 
 * If `SLURM_NTASKS` not found error, then if running from termila, run `export SLURM_NTASKS=1` or if using slurm set `#SBATCH --ntasks=1` or higher values.
+
+### Spectrum Pretraining - Masked Modelling Transformer
+
+AstroCLIP uses a 1D Transformer to encode galaxy spectra. Pretraining is performed using a masked-modeling objective, whereby the 1D spectrum is split into contiguous, overlapping patches. Model training can be launched with the following command:
+
+```bash
+spectrum_trainer fit -c configs/specformer.yaml
+```
+
+We train the model using 4 A100 GPUs (on 1 node) for 30k steps which takes roughly 12 hours.
 
 ### Classification
 
