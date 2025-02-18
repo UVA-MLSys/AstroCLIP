@@ -47,17 +47,20 @@ If no environment is specified, the default path at Flatiron will be assumed.
 
 DESI-LS Data Release 9 from 2021 January as prepared by Stein et al. (2021b) [1]. Contains 76 million galaxy images.
 
-* [Globus](https://app.globus.org/file-manager?origin_id=59c818dc-8542-46d8-80d9-ab144669c7b6&origin_path=%2Fssl-legacysurvey%2F): The data set is large (20 TB). Contains two subfolders `north` and `south` with 14 and 62 `h5` files respectively. There is also a small toy datasample in the [Github](https://github.com/georgestein/ssl-legacysurvey) at [data/tiny_dataset.h5](https://github.com/georgestein/ssl-legacysurvey/blob/main/data/tiny_dataset.h5).
+* [Globus](https://app.globus.org/file-manager?origin_id=59c818dc-8542-46d8-80d9-ab144669c7b6&origin_path=%2Fssl-legacysurvey%2F): The data set is large (20 TB). Contains two subfolders `north` and `south` with 14 and 62 `h5` files respectively. Downloading at least 1 is fine for reproducing.
+* There is also a small toy datasample in the [Github](https://github.com/georgestein/ssl-legacysurvey) at [data/tiny_dataset.h5](https://github.com/georgestein/ssl-legacysurvey/blob/main/data/tiny_dataset.h5). But this would require slightly modifying the dataloaders.
 * Download the data into `datasets/decals` folder.
 
 ### DESI Spectra
 
+The optical spectra from the [Dark Energy Spectroscopic Instrument (DESI)](https://www.desi.lbl.gov/) Early Data Release (EDR). This data is crossmatched with the image data to create the cross-match dataset for multimodal training. Then this dataset isn't used anymore. So we can skip downloading this data and just download the cross matched dataset next.
 
 ### Cross-Matched data
 
 The 60GB (80GB after extraction) cross matched data from image and spectra is available to download using the [download_matched_data.py](./scripts/download_matched_data.py) script. This caches the huggingface data and save the dataset to disk at `datasets/astroclip_file` location. You can remove the cached huggingface data afterward. We only need the Dataset saved to disk.
 
 * Run `python scripts/download_matched_data.py`. Takes couple of hours depending on your network speed.
+* The last extracting part takes quite large RAM memory.
 
 This dataset is used for the multimodal training and all later downstream tasks.
 
@@ -81,7 +84,7 @@ Download the pretrained models listed in the readme. Save them in `pretrained` f
 
 ## Benchmark
 
-### CLIP Alignment:
+### CLIP Alignment
 
 Once pretrained, we align the image and spectrum encoder using cross-attention projection heads to maximize the similarity between cross-modal embeddings that correspond to the same galaxy while simultaneously minimizing the similarity between cross-modal embeddings that correspond to different galaxies. Model training can be launched with the following command:
 ```
@@ -100,8 +103,6 @@ We train the model using 4 A100 GPUs (on 1 node) for 25k steps or until the vali
 
 * `python .\downstream_tasks\property_estimation\property_utils\cross_match.py`. For a smaller subset use `python .\downstream_tasks\property_estimation\property_utils\cross_match.py --num_workers 0 --batch_size 64 --max_size 5000`. When on windows, keep the num_workers=0.
 * `python .\downstream_tasks\property_estimation\embed_provabgs.py`. Reduce the batch size if running locally. Batch 32 takes ~1h.
-
-For the next 
 
 
 ### Similarity Search
